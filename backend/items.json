@@ -1,0 +1,31 @@
+[{
+  "_id": {
+    "$oid": "60af5b11bbe877485071164a"
+  },
+  "name": "test22",
+  "purchase_price": 20,
+  "selling_price": 200022,
+  "stock": 2000,
+  "image_url": "images/C:\\fakepath\\Screenshot (11).png",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "60af5bd9f985211f180e39c8"
+  },
+  "name": "test 3",
+  "purchase_price": 4000,
+  "selling_price": 40000,
+  "stock": 10,
+  "image_url": "images/C:\\fakepath\\Screenshot (16).png",
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "60af5c9ef985211f180e39ca"
+  },
+  "name": "test",
+  "purchase_price": 60000,
+  "selling_price": 90000,
+  "stock": 10,
+  "image_url": "images/C:\\fakepath\\Screenshot (4).png",
+  "__v": 0
+}]

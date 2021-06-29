@@ -1,96 +1,167 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
+const db = require("./config/db");
+
 const { uploadSingle } = require("./middleware/multer");
 const app = express();
 const port = 3001;
 
-const ItemModel = require("./models/items");
+const Employee = require("./models/employee");
 
-mongoose.connect("mongodb://localhost:27017/nutech-integrasi", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-});
-
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
-app.get("/item", async (req, res) => {
-  try {
-    const { limit = 10, page = 1 } = req.body;
-    console.log(req.query);
-    const items = await ItemModel.find({})
-      .skip((page - 1) * limit)
-      .limit(limit * 1)
-      .exec();
+db.authenticate().then(() =>
+  console.log("berhasil terkoneksi dengan database")
+);
 
-    const count = await ItemModel.countDocuments();
+app.get("/employee", async (req, res) => {
+  try {
+    // const { limit = 10, page = 1 } = req.body;
+    // const items = await ItemModel.find({})
+    //   .skip((page - 1) * limit)
+    //   .limit(limit * 1)
+    //   .exec();
+
+    // const count = await ItemModel.countDocuments();
+    // res.json({
+    //   status: 200,
+    //   message: "Success",
+    //   items,
+    //   totalPages: Math.ceil(count / limit),
+    //   currentPage: page,
+    // });
+
+    const employees = await Employee.findAll({});
     res.json({
       status: 200,
       message: "Success",
-      items,
-      totalPages: Math.ceil(count / limit),
-      currentPage: page,
+      employees,
     });
   } catch (error) {
     res.json({ status: 500, message: error.message });
   }
 });
-app.post("/item", uploadSingle, async (req, res) => {
+
+app.post("/employee", uploadSingle, async (req, res) => {
   try {
-    const { name, purchase_price, selling_price, stock, file } = req.body;
-    const item = await ItemModel.create({
-      name,
-      purchase_price,
-      selling_price,
-      stock,
-      image_url: `images/${file}`,
+    const {
+      first_name,
+      last_name,
+      phone_number,
+      dob,
+      province,
+      city,
+      address,
+      ktp_number,
+      current_position,
+      bank_account_number,
+      bank_account,
+    } = req.body;
+
+    const employee = new Employee({
+      first_name,
+      last_name,
+      phone_number,
+      dob,
+      province,
+      city,
+      address,
+      ktp_number,
+      current_position,
+      bank_account_number,
+      bank_account,
+      // image_url: `images/${file}`,
     });
-    res.json({ status: 201, message: "Data berhasil ditambahkan!", item });
+
+    await employee.save();
+
+    res.json({ status: 201, message: "Data berhasil ditambahkan!", employee });
   } catch (error) {
     res.json({ status: 500, message: error.message });
   }
 });
-app.get("/item-detail/:id", async (req, res) => {
-  const { id } = req.params;
+
+app.get("/employee/:id", async (req, res) => {
   try {
-    const item = await ItemModel.findById(id);
-    res.json({ status: 200, message: "Success", item });
-  } catch (error) {
-    res.json({ status: 500, message: error.message });
+    const id = req.params.id;
+
+    const employee = await Employee.findOne({
+      where: { id },
+    });
+
+    res.json({
+      status: 200,
+      message: "Success",
+      employee,
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("server error");
   }
 });
-app.put("/item", async (req, res) => {
+
+app.delete("/employee/:id", async (req, res) => {
   try {
-    const { _id, name, purchase_price, selling_price, stock, file } = req.body;
-    const item = await ItemModel.findOne({ _id });
-    if (file) {
-      // await fs.unlink(path.join(`public/images/${item.image_url}`));
-      item.image_url = `images/${file}`;
-    }
+    const id = req.params.id;
 
-    item.name = name;
-    item.purchase_price = purchase_price;
-    item.selling_price = selling_price;
-    item.stock = stock;
+    const employee = await Employee.destroy({
+      where: { id },
+    });
 
-    await item.save();
-    res.json({ status: 200, message: "Success", item });
-  } catch (error) {
-    res.json({ status: 500, message: error.message });
+    await employee;
+
+    res.json({ status: 201, message: "Data berhasil dihapus!", data: [] });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("server error");
   }
 });
-app.delete("/item/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const item = await ItemModel.findOne({ _id: id });
-    await item.remove();
 
-    res.json({ status: 200, message: "Data Berhasil Dihapus", item });
-  } catch (error) {
-    res.json({ status: 500, message: error.message });
+// E:\reactjs\practical-test\backend\assets
+app.put("/employee/:id", async (req, res) => {
+  try {
+    const {
+      first_name,
+      last_name,
+      phone_number,
+      dob,
+      province,
+      city,
+      address,
+      ktp_number,
+      current_position,
+      bank_account_number,
+      bank_account,
+    } = req.body;
+    const id = req.params.id;
+
+    console.log(req.body);
+
+    const employee = await Employee.update(
+      {
+        first_name,
+        last_name,
+        phone_number,
+        dob,
+        province,
+        city,
+        address,
+        ktp_number,
+        current_position,
+        bank_account_number,
+        bank_account,
+      },
+      { where: { id } }
+    );
+
+    await employee;
+
+    res.json({ status: 201, message: "Data berhasil diubah!", employee });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("server error");
   }
 });
 

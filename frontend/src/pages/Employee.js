@@ -20,7 +20,7 @@ import {
   ModalFooter,
 } from "reactstrap";
 
-import { deleteItem, getDetailItem, getItems } from "api/Item";
+import { deleteEmployee, getEmployee, getEmployees } from "api/Employee";
 
 export default class Items extends Component {
   state = {
@@ -35,11 +35,11 @@ export default class Items extends Component {
   };
 
   componentDidMount() {
-    getItems()
+    getEmployees()
       .then((data) => {
         this.setState({
           ...this.state,
-          result: data.data.items,
+          result: data.data.employees,
         });
       })
       .catch((error) => {
@@ -50,17 +50,17 @@ export default class Items extends Component {
   componentDidUpdate(prevState) {
     const { page, limit } = this.state;
     if (prevState.page !== page) {
-      getItems({ page, limit });
+      getEmployees({ page, limit });
     }
   }
 
   onClickDetail = (id) => {
-    getDetailItem(id)
+    getEmployee(id)
       .then((data) => {
         this.setState({
           ...this.state,
           editModal: true,
-          view: data.data.item,
+          view: data.data.employee,
         });
       })
       .catch((error) => {
@@ -69,7 +69,7 @@ export default class Items extends Component {
   };
 
   onClickDelete = async (id) => {
-    await deleteItem(id)
+    await deleteEmployee(id)
       .then(() => {
         this.setState({
           ...this.state,
@@ -80,6 +80,10 @@ export default class Items extends Component {
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  onClickScan = async (url) => {
+    console.log(url);
   };
 
   onClickNext = () => {
@@ -108,25 +112,25 @@ export default class Items extends Component {
           <ModalHeader
             toggle={() => this.setState({ deleteModal: false, id: null })}
           >
-            Tambah Barang
+            Add Employee
           </ModalHeader>
           <ModalBody>
             <h3 className="text-red text-center">
-              <strong>Peringatan!</strong>
+              <strong>Danger!</strong>
             </h3>
             <h4 className="text-red text-center">
-              Tindakan ini akan melakukan penghapusan data, apakah anda yakin?
+              This action will delete your data, Are you sure?
             </h4>
           </ModalBody>
           <ModalFooter className="mt-n3">
             <Button color="primary" onClick={() => this.onClickDelete(id)}>
-              <i className="fa fa-trash-alt" /> Hapus Data
+              <i className="fa fa-trash-alt" /> Delete Data
             </Button>
             <Button
               color="secondary"
               onClick={() => this.setState({ deleteModal: false, id: null })}
             >
-              <i className="fa fa-times-circle" /> Batal
+              <i className="fa fa-times-circle" /> Cancel
             </Button>
           </ModalFooter>
         </>
@@ -138,16 +142,14 @@ export default class Items extends Component {
     const { addModal, editModal, result, view, deleteModal, page } = this.state;
     return (
       <Container className="mt-5">
-        <h2 className="text-center">
-          Practical Test React Js PT.NUTECH INTEGRASI
-        </h2>
+        <h2 className="text-center">Practical Test PT Juke Solusi Teknologi</h2>
         <Row>
           <div className="col">
             <Card className="shadow">
               <CardHeader className="border-0">
                 <Row>
                   <Col sm="6">
-                    <h3 className="mb-0">Data Barang</h3>
+                    <h3 className="mb-0">Employee List</h3>
                   </Col>
                   <Col sm="6" className="text-right">
                     <Button
@@ -155,7 +157,7 @@ export default class Items extends Component {
                       color="primary"
                       onClick={() => this.setState({ addModal: true })}
                     >
-                      <i className="fas fa-plus-circle" /> Tambah Barang
+                      <i className="fas fa-plus-circle" /> Add Employee
                     </Button>
                   </Col>
                 </Row>
@@ -178,11 +180,12 @@ export default class Items extends Component {
                 <thead className="thead-light">
                   <tr>
                     <th scope="col">No</th>
-                    <th scope="col">Nama</th>
-                    <th scope="col">Harga Beli</th>
-                    <th scope="col">Harga Jual</th>
-                    <th scope="col">Stok</th>
-                    <th scope="col">Foto</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">DOB</th>
+                    <th scope="col">address</th>
+                    <th scope="col">Current Position</th>
+                    <th scope="col">KTP File</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
@@ -190,22 +193,27 @@ export default class Items extends Component {
                   {result.map((value, index) => (
                     <tr key={index}>
                       <td>{index + 1}</td>
-                      <td>{value.name}</td>
-                      <td>Rp. {value.purchase_price}</td>
-                      <td>Rp. {value.selling_price}</td>
-                      <td>{value.stock}</td>
                       <td>
-                        <img
-                          src={`https://localhost:3000/${value.image_url}`}
-                          width="70px"
-                          className="img-fluid"
-                        />
+                        {value.first_name} {value.last_name}
+                      </td>
+                      <td>{value.phone_number}</td>
+                      <td>{value.dob}</td>
+                      <td>{value.address}</td>
+                      <td>{value.current_position}</td>
+                      <td>
+                        <Button
+                          className="block btn-sm"
+                          color="info"
+                          onClick={() => this.onClickScan(value.image_url)}
+                        >
+                          <i className="fas fa-file-alt" /> KTP File
+                        </Button>
                       </td>
                       <td>
                         <Button
                           className="block btn-sm"
                           color="primary"
-                          onClick={() => this.onClickDetail(value._id)}
+                          onClick={() => this.onClickDetail(value.id)}
                         >
                           <i className="fas fa-pencil-alt" /> Edit
                         </Button>
@@ -213,7 +221,7 @@ export default class Items extends Component {
                           className="block btn-sm"
                           color="danger"
                           onClick={() =>
-                            this.setState({ deleteModal: true, id: value._id })
+                            this.setState({ deleteModal: true, id: value.id })
                           }
                         >
                           <i className="fas fa-trash-alt" /> Delete

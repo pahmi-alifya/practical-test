@@ -5,7 +5,7 @@ import "assets/plugins/nucleo/css/nucleo.css";
 import "assets/scss/argon-dashboard-react.scss";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-import Items from "pages/Items";
+import Items from "pages/Employee";
 
 function App() {
   return (

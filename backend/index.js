@@ -44,7 +44,7 @@ app.get("/employee", async (req, res) => {
   }
 });
 
-app.post("/employee", uploadSingle, async (req, res) => {
+app.post("/employee", async (req, res) => {
   try {
     const {
       first_name,
@@ -72,7 +72,7 @@ app.post("/employee", uploadSingle, async (req, res) => {
       current_position,
       bank_account_number,
       bank_account,
-      // image_url: `images/${file}`,
+      image_url: `images/${req.file.filename}`,
     });
 
     await employee.save();
@@ -119,7 +119,7 @@ app.delete("/employee/:id", async (req, res) => {
   }
 });
 
-// E:\reactjs\practical-test\backend\assets
+
 app.put("/employee/:id", async (req, res) => {
   try {
     const {
@@ -137,8 +137,6 @@ app.put("/employee/:id", async (req, res) => {
     } = req.body;
     const id = req.params.id;
 
-    console.log(req.body);
-
     const employee = await Employee.update(
       {
         first_name,
@@ -152,10 +150,10 @@ app.put("/employee/:id", async (req, res) => {
         current_position,
         bank_account_number,
         bank_account,
+        image_url: `images/${req.file.filename}`,
       },
       { where: { id } }
     );
-
     await employee;
 
     res.json({ status: 201, message: "Data berhasil diubah!", employee });

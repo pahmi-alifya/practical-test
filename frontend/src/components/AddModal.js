@@ -27,6 +27,7 @@ const AddModal = (props) => {
   const { isOpen, className, isClose } = props;
   const [modal, setModal] = useState(isOpen);
   const [value, setValue] = useState(null);
+  const [image, setImage] = useState(null);
   const [province, setProvince] = useState(null);
   const [city, setCity] = useState(null);
   const toggle = () => setModal(!modal) & isClose(!modal);
@@ -44,6 +45,10 @@ const AddModal = (props) => {
   const handleChangeInput = (event) => {
     let name = event.target.name;
     setValue({ ...value, [name]: event.target.value });
+  };
+
+  const handleChangeFile = (event) => {
+    setImage(event.target.files[0]);
   };
 
   const handleChangeProvince = async (option) => {
@@ -64,13 +69,6 @@ const AddModal = (props) => {
 
   const handleChangeOption = (data, key) => {
     setValue({ ...value, [key]: data.value });
-  };
-
-  const handleFinish = async () => {
-    await createEmployee(value);
-    window.location.reload();
-    setModal(!modal);
-    isClose(!modal);
   };
 
   const handleChangeDate = (date) => {
@@ -94,6 +92,18 @@ const AddModal = (props) => {
     setCity(items);
   };
 
+  const handleFinish = async () => {
+    let formData = new FormData();
+    formData.append("file", image);
+    formData.set("data", { ...value });
+
+    await createEmployee(formData);
+
+    window.location.reload();
+    setModal(!modal);
+    isClose(!modal);
+  };
+
   return (
     <div>
       <Modal
@@ -113,7 +123,7 @@ const AddModal = (props) => {
                 id="first_name"
                 bsSize="sm"
                 onChange={handleChangeInput}
-                required
+                required={true}
               />
             </FormGroup>
             <FormGroup>
@@ -238,7 +248,7 @@ const AddModal = (props) => {
                 type="file"
                 name="file"
                 id="file"
-                onChange={handleChangeInput}
+                onChange={handleChangeFile}
                 required
               />
               <FormText color="red">

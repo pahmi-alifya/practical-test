@@ -26,6 +26,7 @@ const EditModal = (props) => {
   const { isOpen, className, isClose, data } = props;
   const [modal, setModal] = useState(isOpen);
   const [value, setValue] = useState(data);
+  const [image, setImage] = useState(null);
   const [province, setProvince] = useState(null);
   const [city, setCity] = useState(null);
   const toggle = () => setModal(!modal) & isClose(!modal);
@@ -56,6 +57,10 @@ const EditModal = (props) => {
     setValue({ ...value, city: option.label });
   };
 
+  const handleChangeFile = (event) => {
+    setImage(event.target.files[0]);
+  };
+
   const handleChangeInput = (event) => {
     let name = event.target.name;
     setValue({ ...value, [name]: event.target.value });
@@ -65,7 +70,11 @@ const EditModal = (props) => {
   };
 
   const handleFinish = async () => {
-    await updateEmployee(value);
+    let formData = new FormData();
+    formData.append("file", image);
+    formData.set("data", { ...value });
+
+    await updateEmployee(formData);
     window.location.reload();
     setModal(!modal);
     isClose(!modal);
@@ -252,7 +261,7 @@ const EditModal = (props) => {
                 type="file"
                 name="file"
                 id="file"
-                onChange={handleChangeInput}
+                onChange={handleChangeFile}
               />
               <FormText color="red">
                 <strong>Warning:</strong>

@@ -11,7 +11,11 @@ const getEmployee = async (id) => {
 };
 
 const createEmployee = async (data) => {
-  let newEmployee = await axios.post("http://localhost:3001/employee", data);
+  let newEmployee = await axios.post("http://localhost:3001/employee", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return newEmployee;
 };
 
@@ -19,7 +23,12 @@ const updateEmployee = async (data) => {
   let id = data.id;
   let changeEmployee = await axios.put(
     "http://localhost:3001/employee/" + id,
-    data
+    data,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
   );
   return changeEmployee;
 };
